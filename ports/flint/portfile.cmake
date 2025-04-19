@@ -17,4 +17,14 @@ vcpkg_configure_make(
 vcpkg_install_make()
 vcpkg_copy_pdbs()
 vcpkg_fixup_pkgconfig()
+
+# Patch flint.pc to ensure it links against GMP, MPFR and the standard math library.
+file(READ "${CURRENT_PACKAGES_DIR}/lib/pkgconfig/flint.pc" _pc_content)
+string(REPLACE
+    "Libs: \"-L\${libdir}\" -lflint"
+    "Libs: \"-L\${libdir}\" -lflint -lgmp -lmpfr -lm"
+    _pc_content "${_pc_content}"
+)
+file(WRITE "${CURRENT_PACKAGES_DIR}/lib/pkgconfig/flint.pc" "${_pc_content}")
+
 vcpkg_install_copyright(FILE_LIST "${SOURCE_PATH}/COPYING" "${SOURCE_PATH}/COPYING.LESSER")
